@@ -12,7 +12,6 @@ class BitMEX:
         self.prices = {}
         self.callback_tg = callback_tg
         self.callback_db = callback_db
-        self.c = 0
 
         for pair in pairs:
             ws = BitMEXWebsocket(endpoint="https://testnet.bitmex.com/api/v1", symbol=pair, api_key=None,
@@ -20,8 +19,6 @@ class BitMEX:
             self.prices[pair] = [ws, []]
 
     def update_ticker(self):
-        self.c += 1
-        print(self.c)
         message = ""
         if len(self.prices.keys()):
             for k, v in self.prices.items():
@@ -30,8 +27,6 @@ class BitMEX:
 
                 max_price = max([p['price'] for p in v[1]])
                 percent_change = float(max_price / v[0].data['instrument'][0]["midPrice"] - 1) * 100
-
-                print(percent_change)
 
                 if percent_change >= self.ps_change_callback:
                     message += "Цена на рынке {0} упала  на {1}% и теперь составляет {2}\n".format(
