@@ -49,7 +49,8 @@ class Db:
         self.check_db()
 
     def check_db(self):
-        tables = self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';").fetchall()
+        self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
+        tables = self.db.fetchall()
         print("tables:", tables)
         tables = [t[0] for t in tables] if len(tables) > 0 else tables
 
@@ -60,7 +61,8 @@ class Db:
             self.db.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
 
     def select_active_chats(self):
-        active_chats = self.db.execute("SELECT chat_id FROM chats;").fetchall()
+        self.db.execute("SELECT chat_id FROM chats;")
+        active_chats = self.db.fetchall()
         active_chats = [a[0] for a in active_chats] if len(active_chats) > 0 else active_chats
         return active_chats
 
