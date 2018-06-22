@@ -36,6 +36,7 @@ class BitMEX:
                     v[1] = [{"time": time.time(), "price": v[0].data['instrument'][0]["midPrice"]}]
             if message:
                 self.callback_tg(message)
+                print(message)
 
 
 class Db:
@@ -105,7 +106,7 @@ class Tg:
 
     def _send_message(self, text, chat=None):
         if not chat:
-			chat = self.active_chats
+            chat = self.active_chats
         if not (isinstance(chat, type([]))):
             chat = [chat]
 
@@ -135,9 +136,9 @@ if __name__ == "__main__":
             for update in tg.updates:
                 if not update['message']["chat"]["id"] in tg.active_chats :
                     tg.active_chats.append(update['message']["chat"]["id"])
-					tg._send_message("Теперь вы будете получать оповещения об изменении цены", update['message']["chat"]["id"])
+                    tg._send_message("Теперь вы будете получать оповещения об изменении цены", update['message']["chat"]["id"])
                     db.append_active_chats(update)
-                    print(update['message']['text'])
+                    print("Incoming message: ",update['message']['text'])
 
         bm.update_ticker()
 
