@@ -1,5 +1,6 @@
 import time, json, requests
-import sqlite3
+import os
+import psycopg2
 import threading
 from bitmex_websocket import BitMEXWebsocket
 
@@ -42,40 +43,34 @@ class BitMEX:
 
 class Db:
     def __init__(self, name="db.db"):
-        self.conn = sqlite3.connect(name)
-        self.cursor = self.conn.cursor()
-
+        DATABASE_URL = os.environ['DATABASE_URL']
+        self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.db = self.conn.cursor()
         self.check_db()
 
-    def __del__(self):
-        self.cursor.close()
-        self.conn.close()
-
     def check_db(self):
-        tables = self.cursor.execute("SELECT name FROM sqlite_master WHERE type='table';").fetchall()
+        tables = self.db.execute("SELECT table_name FROM information_schema.tables").fetchall()
+        print("tables:", tables)
         tables = [t[0] for t in tables] if len(tables) > 0 else tables
 
         if (not "history" in tables):
-            self.cursor.execute(
+            self.db.execute(
                 "CREATE TABLE history (timestamp INT, pair VARCHAR, price REAL, percent_change REAL);")
         if (not "chats" in tables):
-            self.cursor.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
-            self.conn.commit()
+            self.db.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
 
     def select_active_chats(self):
-        active_chats = self.cursor.execute("SELECT chat_id FROM chats;").fetchall()
+        active_chats = self.db.execute("SELECT chat_id FROM chats;").fetchall()
         active_chats = [a[0] for a in active_chats] if len(active_chats) > 0 else active_chats
         return active_chats
 
     def append_active_chats(self, update):
-        self.cursor.execute("INSERT INTO chats VALUES (%s);"
+        self.db.execute("INSERT INTO chats VALUES (%s);"
                             % (str(update['message']["chat"]["id"])))
-        self.conn.commit()
 
     def write_event(self, time, pair, price, change):
-        self.cursor.execute("INSERT INTO history VALUES (%i, '%s', %f, %f);"
+        self.db.execute("INSERT INTO history VALUES (%i, '%s', %f, %f);"
                             % (int(time), pair, round(price, 2), round(change, 2)))
-        self.conn.commit()
 
 
 class Tg:
