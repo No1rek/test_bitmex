@@ -56,15 +56,22 @@ class Db:
         print(self.db.fetchone()[0])
         # self.db.execute("sow tables")
         self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
-        tables = self.db.fetchall()
-        print("tables:", tables)
-        tables = [t[0] for t in tables] if len(tables) > 0 else tables
 
-        if (not "history" in tables):
-            self.db.execute(
-                "CREATE TABLE history (timestamp INT, pair VARCHAR, price REAL, percent_change REAL);")
-        if (not "chats" in tables):
-            self.db.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
+        self.db.execute("CREATE TABLE history (timestamp INT, pair VARCHAR, price REAL, percent_change REAL);")
+        self.db.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
+        tables = self.db.fetchall()
+        print(tables)
+
+
+        # tables = self.db.fetchall()
+        # print("tables:", tables)
+        # tables = [t[0] for t in tables] if len(tables) > 0 else tables
+        #
+        # if (not "history" in tables):
+        #     self.db.execute(
+        #         "CREATE TABLE history (timestamp INT, pair VARCHAR, price REAL, percent_change REAL);")
+        # if (not "chats" in tables):
+        #     self.db.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
 
     def select_active_chats(self):
         self.db.execute("SELECT chat_id FROM chats;")
