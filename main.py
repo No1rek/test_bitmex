@@ -3,8 +3,6 @@ import sqlite3
 import threading
 from bitmex_websocket import BitMEXWebsocket
 
-# class BitMEX - логика взаимодествия с биржей
-
 
 class BitMEX:
     def __init__(self, pairs, callback_tg=None, callback_db=None, history_length_s=35, ps_change_callback=0.5):
@@ -27,12 +25,10 @@ class BitMEX:
         message = ""
         if len(self.prices.keys()):
             for k, v in self.prices.items():
-                # v[0].data['instrument'][0]["midPrice"] *= 1-self.c*0.0001
                 v[1] = [p for p in v[1] if time.time() - p['time'] <= self.history_length_s]
                 v[1].append({"time": time.time(), "price": v[0].data['instrument'][0]["midPrice"]})
 
                 max_price = max([p['price'] for p in v[1]])
-                # v[1][0]['price'] += v[1][0]['price']*0.001
                 percent_change = float(max_price / v[0].data['instrument'][0]["midPrice"] - 1) * 100
 
                 print(percent_change)
@@ -85,7 +81,7 @@ class Db:
         self.conn.commit()
 
 
-class Tg():
+class Tg:
     def __init__(self):
         self.api_url = "https://api.telegram.org/bot556825305:AAEHg7B4FGF2Rzam7e5tl57EDe7lUjphOdA/"
         self.offset = 0
