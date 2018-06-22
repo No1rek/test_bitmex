@@ -96,15 +96,16 @@ class Tg:
 
     def get_updates(self):
         while True:
-            response = json.loads(requests.get(self.api_url + 'getUpdates', params={"offset": self.offset}).text)
+            response = json.loads(requests.get(self.api_url + 'getUpdates', params={"offset": self.offset, "allowed_updates":["message"]}).text)
             self.updates = response['result']
             if len(self.updates) > 0:
                 last_update_id = self.updates[-1]['update_id']
                 self.offset = last_update_id
             time.sleep(timeout)
 
-    def _send_message(self, text):
-        chat = self.active_chats
+    def _send_message(self, text, chat=None):
+        if not chat:
+			chat = self.active_chats
         if not (isinstance(chat, type([]))):
             chat = [chat]
 
@@ -132,8 +133,9 @@ if __name__ == "__main__":
     while True:
         if len(tg.updates) > 0:
             for update in tg.updates:
-                if not update['message']["chat"]["id"] in tg.active_chats:
+                if not update['message']["chat"]["id"] in tg.active_chats :
                     tg.active_chats.append(update['message']["chat"]["id"])
+					tg._send_message("Теперь вы будете получать оповещения об изменении цены", update['message']["chat"]["id"])
                     db.append_active_chats(update)
                     print(update['message']['text'])
 
