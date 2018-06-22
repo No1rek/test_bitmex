@@ -27,6 +27,7 @@ class BitMEX:
 
                 max_price = max([p['price'] for p in v[1]])
                 percent_change = float(max_price / v[0].data['instrument'][0]["midPrice"] - 1) * 100
+                print(k, "is currently ", v[0].data['instrument'][0]["midPrice"], " down change is: ", percent_change, "%")
 
                 if percent_change >= self.ps_change_callback:
                     message += "Цена на рынке {0} упала  на {1}% и теперь составляет {2}\n".format(
