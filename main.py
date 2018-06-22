@@ -1,8 +1,10 @@
 import time, json, requests
 import os
 import psycopg2
+from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 import threading
 from bitmex_websocket import BitMEXWebsocket
+
 
 
 class BitMEX:
@@ -45,10 +47,14 @@ class Db:
     def __init__(self, name="db.db"):
         DATABASE_URL = os.environ['DATABASE_URL']
         self.conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+        self.conn.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         self.db = self.conn.cursor()
         self.check_db()
 
     def check_db(self):
+        self.db.execute("current_database()")
+        print(self.db.fetchone()[0])
+        # self.db.execute("sow tables")
         self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
         tables = self.db.fetchall()
         print("tables:", tables)
