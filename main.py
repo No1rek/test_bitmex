@@ -49,7 +49,7 @@ class Db:
         self.check_db()
 
     def check_db(self):
-        tables = self.db.execute("SELECT table_name FROM information_schema.tables").fetchall()
+        tables = self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';").fetchall()
         print("tables:", tables)
         tables = [t[0] for t in tables] if len(tables) > 0 else tables
 
