@@ -52,18 +52,6 @@ class Db:
         self.check_db()
 
     def check_db(self):
-        # self.db.execute("current_database()")
-        # print(self.db.fetchone()[0])
-        # self.db.execute("sow tables")
-
-
-        # self.db.execute("CREATE TABLE history (timestamp INT, pair VARCHAR, price REAL, percent_change REAL);")
-        # self.db.execute("CREATE TABLE chats (chat_id INT NOT NULL);")
-        #
-        # self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
-        # tables = self.db.fetchall()
-        # print(tables)
-
         self.db.execute("select relname from pg_class where relkind='r' and relname !~ '^(pg_|sql_)';")
         tables = self.db.fetchall()
         print("tables:", tables)
